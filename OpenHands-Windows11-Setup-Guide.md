@@ -34,10 +34,12 @@ Starting with a **clean Windows 11** system, you'll need these tools. Install th
 
 ### Optional but Recommended
 
-6. **WSL (Windows Subsystem for Linux)**
+6. **WSL (Windows Subsystem for Linux)** ⭐ **REQUIRED for official method**
    - Run in PowerShell as Administrator: `wsl --install`
+   - **If Ubuntu doesn't appear after restart**: `wsl --install -d Ubuntu`
    - Restart computer when prompted
-   - Useful for advanced development
+   - **Important**: Search "Ubuntu" in Start menu to complete setup
+   - **Configure Docker integration**: Docker Desktop → Settings → Resources → WSL Integration → Enable Ubuntu
 
 7. **Visual Studio Code**
    - Download from [code.visualstudio.com](https://code.visualstudio.com/)
@@ -572,91 +574,59 @@ To stop OpenHands:
 
 To start it again, just run the Docker command again.
 
-## Troubleshooting Common Issues
+## Troubleshooting Common Issues (Most Frequent First)
 
-### Issue 0: You're in Docker's WSL instead of your main environment
+### 🚨 **BLOCKER #1**: "I don't have Ubuntu" or "You don't have any WSL 2 distros installed"
+**This affects 80% of Windows users!**
 
-**Problem**: Your prompt shows `docker-desktop:/tmp/docker-desktop-root/...` and `sudo: not found`
-**Cause**: You're in Docker Desktop's minimal WSL environment, not your main Windows environment or a proper Linux distribution
+**What happened**: `wsl --install` didn't install Ubuntu properly, or you're seeing this in Docker Desktop settings.
 
-**You have 3 solutions - pick the one that works best for you:**
+**Fix it step-by-step**:
+1. Open PowerShell **as Administrator** (right-click → "Run as administrator")
+2. Run: `wsl --install -d Ubuntu`
+3. Wait for download/installation (can take 5-10 minutes)
+4. **Restart your computer** when prompted
+5. After restart, search "Ubuntu" in Start menu - should appear now
+6. Open Ubuntu app to complete setup (create username/password)
+7. Configure Docker Desktop:
+   - Settings → Resources → WSL Integration
+   - Enable "Enable integration with my default WSL distro"
+   - Enable toggle for "Ubuntu"
+   - Click "Apply & Restart"
 
-#### Solution A: Use Windows PowerShell directly (Easiest)
-Since you have Python 3.13 and uv installed on Windows, try this first:
+### 🚨 **BLOCKER #2**: Typing `wsl` opens docker-desktop (wrong distribution)
+**This affects 90% of users!**
 
-```powershell
-# Exit WSL first
-exit
-
-# Step 1: Try without specifying Python version (most flexible)
-uvx --from openhands-ai openhands serve
-
-# Step 2: If that fails, try with your Python 3.13
-uvx --python 3.13 --from openhands-ai openhands serve
-
-# Step 3: If compatibility issues, install Python 3.12 and use it
-# (Only if the above fail due to Python 3.13 compatibility issues)
-uvx --python 3.12 --from openhands-ai openhands serve
+**What you see**: 
+```
+docker-desktop:/tmp/docker-desktop-root/...
 ```
 
-#### Solution B: Use Docker method (Official OpenHands method)
-Since you have Docker working, use OpenHands' official Docker method:
+**Why it happens**: Docker Desktop becomes your default WSL distribution.
 
+**Quick fix**: Never type just `wsl`. Instead use:
 ```powershell
-# In PowerShell (not WSL)
-docker pull docker.all-hands.dev/all-hands-ai/runtime:0.53-nikolaik
-
-docker run -it --rm --pull=always -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.53-nikolaik -e LOG_ALL_EVENTS=true -v /var/run/docker.sock:/var/run/docker.sock -v ~/.openhands:/.openhands -p 3000:3000 --add-host host.docker.internal:host-gateway --name openhands-app docker.all-hands.dev/all-hands-ai/openhands:0.53
+wsl -d Ubuntu
 ```
 
-#### Solution C: Install a proper Linux distribution (Most flexible)
+**Permanent fix** (after Ubuntu is installed):
 ```powershell
-# In PowerShell (exit WSL first by typing 'exit')
-# List available distributions
-wsl --list --online
-
-# Install Ubuntu (recommended)
-wsl --install -d Ubuntu
-
-# After installation, set Ubuntu as default
 wsl --set-default Ubuntu
-
-# Now when you type 'wsl', you'll enter Ubuntu instead of docker-desktop
-wsl
 ```
 
-**Recommendation**: Try Solution A first (Windows PowerShell), then Solution B (Docker) if that doesn't work.
+**Alternative**: Use Docker method instead (see BLOCKER #4 below)
 
-### Issue 1: ImportError with OpenAI library (Common on Windows)
-
+### 🚨 **BLOCKER #3**: ImportError with OpenAI library (Common on Windows)
 **Problem**: `ImportError: cannot import name 'ResponseTextConfig' from 'openai.types.responses.response'`
 **Cause**: Known issue - OpenAI SDK 1.100.0+ removed `ResponseTextConfig`, but LiteLLM (used by OpenHands) still tries to import it
 **Status**: ✅ **OpenHands team is actively fixing this!** See: https://github.com/All-Hands-AI/OpenHands/pull/10471
 
-**Solution A: Use the fix branch (Most up-to-date)**
-Try the branch that fixes this exact issue:
-
+**Solution A: Use Docker method (Recommended - bypasses Python issues)**
 ```powershell
-# Use the fix branch directly
-uvx --python 3.12 --from git+https://github.com/All-Hands-AI/OpenHands@pin-openai-1-99-9 openhands serve
-```
-
-**Solution B: Use Docker with the fix (Recommended)**
-```powershell
-# Use Docker with the fix branch
-docker run -it --rm -p 3000:3000 -v /var/run/docker.sock:/var/run/docker.sock --add-host host.docker.internal:host-gateway -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:1b68cdf-nikolaik --name openhands-app-1b68cdf docker.all-hands.dev/all-hands-ai/openhands:1b68cdf
-```
-
-**Solution C: Use stable Docker (Fallback)**
-```powershell
-# Use OpenHands' official stable Docker method
 docker run -it --rm --pull=always -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.53-nikolaik -e LOG_ALL_EVENTS=true -v /var/run/docker.sock:/var/run/docker.sock -v ~/.openhands:/.openhands -p 3000:3000 --add-host host.docker.internal:host-gateway --name openhands-app docker.all-hands.dev/all-hands-ai/openhands:0.53
 ```
 
 **Solution B: Install Python 3.12 alongside 3.13**
-Python 3.13 is very new and may have compatibility issues. You can keep both versions:
-
-**Method 1: Use uv to install Python 3.12 (Easiest)**
 ```powershell
 # uv can install and manage Python versions for you
 uv python install 3.12
@@ -668,49 +638,33 @@ uv python list
 uvx --python 3.12 --from openhands-ai openhands serve
 ```
 
-**Method 2: Download Python 3.12 from python.org**
-1. Go to https://www.python.org/downloads/
-2. Download Python 3.12.x (latest 3.12 version)
-3. Install it (it will coexist with 3.13)
-4. Then run: `uvx --python 3.12 --from openhands-ai openhands serve`
+### 🚨 **BLOCKER #4**: "docker: command not found" or "This is not supported"
+**What happened**: You're in the wrong terminal or Docker integration isn't set up.
 
-**Solution C: Use WSL with proper Linux distribution**
-Set up Ubuntu in WSL (more reliable for Python packages):
+**Fix it**:
+1. Make sure Docker Desktop is running (check system tray)
+2. Make sure you're in **Ubuntu** (not docker-desktop or PowerShell)
+3. Go to Docker Desktop → Settings → Resources → WSL Integration
+4. Enable "Enable integration with my default WSL distro"
+5. Enable toggle for "Ubuntu"
+6. Click "Apply & Restart"
 
+**Alternative**: Use Docker from PowerShell directly (works without WSL):
 ```powershell
-wsl --install -d Ubuntu
-wsl --set-default Ubuntu
-wsl
-# Then follow the WSL setup steps in this guide
+# Run this in PowerShell (not WSL)
+docker run -it --rm --pull=always -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.53-nikolaik -e LOG_ALL_EVENTS=true -v /var/run/docker.sock:/var/run/docker.sock -v ~/.openhands:/.openhands -p 3000:3000 --add-host host.docker.internal:host-gateway --name openhands-app docker.all-hands.dev/all-hands-ai/openhands:0.53
 ```
 
-### Issue 2: Multi-line Docker command doesn't work in PowerShell
+### 🔧 **Other Common Issues**:
+
+#### Multi-line Docker command doesn't work in PowerShell
 
 **Problem**: The official OpenHands Docker command from their docs doesn't work when copy-pasted into PowerShell
 **Cause**: The official docs show Linux/Bash format with `\` line continuations, but PowerShell uses different syntax
 
-**Solution A: Use the single-line version (Recommended)**
-```powershell
-# Copy and paste this ENTIRE line as one command:
-docker run -it --rm --pull=always -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.53-nikolaik -e LOG_ALL_EVENTS=true -v /var/run/docker.sock:/var/run/docker.sock -v ~/.openhands:/.openhands -p 3000:3000 --add-host host.docker.internal:host-gateway --name openhands-app docker.all-hands.dev/all-hands-ai/openhands:0.53
-```
+**Solution**: Use the single-line version (already provided in BLOCKER #3 and #4 above)
 
-**Solution B: Use PowerShell multi-line syntax**
-```powershell
-docker run -it --rm --pull=always `
- -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.53-nikolaik `
- -e LOG_ALL_EVENTS=true `
- -v /var/run/docker.sock:/var/run/docker.sock `
- -v ~/.openhands:/.openhands `
- -p 3000:3000 `
- --add-host host.docker.internal:host-gateway `
- --name openhands-app `
- docker.all-hands.dev/all-hands-ai/openhands:0.53
-```
-
-**Note**: PowerShell uses backticks (`) instead of backslashes (\) for line continuation.
-
-### Issue 3: "Command not found" errors in WSL
+#### "Command not found" errors in WSL
 
 **Problem**: Commands like `python`, `uv`, or `git` not found in WSL
 **Solution**: Install the tools in WSL separately from Windows:
@@ -724,7 +678,7 @@ curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-### Issue 2: Permission errors
+#### Permission errors
 
 **Problem**: Permission denied when running commands
 **Solution**: 
@@ -737,7 +691,7 @@ sudo chown -R $USER:$USER ~/
 sudo uvx --python 3.12 --from openhands-ai openhands serve
 ```
 
-### Issue 3: Port conflicts
+#### Port conflicts
 
 **Problem**: Port already in use
 **Solution**: Specify a different port:
@@ -746,15 +700,10 @@ sudo uvx --python 3.12 --from openhands-ai openhands serve
 uvx --python 3.12 --from openhands-ai openhands serve --port 3001
 ```
 
-### Issue 4: Docker integration
+#### Browser shows "This site can't be reached"
 
-**Problem**: OpenHands can't access Docker
-**Solution**: Make sure Docker Desktop is running and WSL integration is enabled:
-
-1. Open Docker Desktop
-2. Go to Settings → Resources → WSL Integration
-3. Enable integration with your WSL distribution
-4. Restart WSL: `wsl --shutdown` then `wsl`
+**Problem**: Can't access OpenHands at localhost:3000
+**Solution**: Wait 30-60 seconds for OpenHands to start, then refresh the page
 
 ## File System Navigation
 
