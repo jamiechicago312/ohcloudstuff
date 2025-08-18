@@ -11,6 +11,7 @@ Starting with a clean Windows 11 Home, install these in order:
    - Run: `wsl --install`
    - Restart computer when prompted
    - Verify: `wsl --version` (should show "Default Version: 2")
+   - **Update**: `wsl --update` (gets latest WSL version)
 
 2. **Ubuntu Linux Distribution** ⭐ **REQUIRED**
    - **Usually installs automatically** with WSL, but often fails
@@ -22,8 +23,20 @@ Starting with a clean Windows 11 Home, install these in order:
      4. Restart computer again
      5. Search "Ubuntu" in Start menu - should appear now
      6. Open Ubuntu to complete setup (create username/password)
+   - **Check version**: In Ubuntu terminal: `lsb_release -a`
+   - **Update**: In Ubuntu terminal: `sudo apt update && sudo apt upgrade -y`
 
-3. **Docker Desktop** ⭐ **REQUIRED**
+3. **uv (Python Package Manager)** ⭐ **REQUIRED** 
+   - **Why needed**: Official OpenHands method + required for MCP servers
+   - **Install in Ubuntu terminal**:
+     ```bash
+     curl -LsSf https://astral.sh/uv/install.sh | sh
+     source $HOME/.cargo/env
+     ```
+   - **Verify**: `uv --version`
+   - **Update**: `uv self update`
+
+4. **Docker Desktop** ⭐ **REQUIRED**
    - Download: [docker.com](https://www.docker.com/products/docker-desktop/)
    - During setup: Enable "Use the WSL 2 based engine"
    - **Important**: After installation, configure WSL integration:
@@ -31,21 +44,23 @@ Starting with a clean Windows 11 Home, install these in order:
      - Enable "Enable integration with my default WSL distro"
      - Enable integration with "Ubuntu"
      - Click "Apply & Restart"
+   - **Update**: Docker Desktop → Check for updates
 
-4. **Git for Windows** (Optional but recommended)
+5. **Git for Windows** (Optional but recommended)
    - Download: [git-scm.com](https://git-scm.com/download/win)
    - Use default installation options
+   - **Update**: Download latest version from website
 
 ## Quick Setup Steps
 
-### Step 1: Open the Correct WSL Terminal
+### Step 1: Open the Correct WSL Terminal & Set Default
 **⚠️ CRITICAL**: Never just type `wsl` - it opens the wrong distribution!
 
 **✅ CORRECT Methods:**
 - **Method 1 (Recommended)**: Search "Ubuntu" in Start menu and open it
 - **Method 2**: In PowerShell, type `wsl -d Ubuntu` (not just `wsl`)
 
-**❌ WRONG**: Typing just `wsl` opens docker-desktop distribution (doesn't work with Docker CLI)
+**❌ WRONG**: Typing just `wsl` opens docker-desktop distribution (doesn't work)
 
 **If you don't have Ubuntu yet:**
 1. Open PowerShell as Administrator
@@ -53,16 +68,33 @@ Starting with a clean Windows 11 Home, install these in order:
 3. Restart computer
 4. Then use Method 1 or 2 above
 
+**Set Ubuntu as Default (Recommended):**
+```powershell
+# In PowerShell - check what distributions you have
+wsl --list
+
+# Set Ubuntu as default so 'wsl' opens Ubuntu
+wsl --set-default Ubuntu
+
+# Verify Ubuntu version
+wsl -d Ubuntu -- lsb_release -a
+```
+
 ### Step 2: Verify Docker is Running
-In the WSL terminal, run:
+In the Ubuntu terminal, run:
 ```bash
 docker --version
 ```
 You should see a version number.
 
-### Step 3: Run OpenHands
-Copy and paste this entire command into the WSL terminal:
+### Step 3: Run OpenHands (Official uv Method)
+In the Ubuntu terminal, run the **official recommended method**:
+```bash
+# Official OpenHands method using uv (recommended)
+uvx --python 3.12 --from openhands-ai openhands serve
+```
 
+**Alternative Docker Method:**
 ```bash
 docker run -it --rm --pull=always \
     -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.53-nikolaik \
@@ -80,10 +112,10 @@ Wait for this message:
 INFO:     Uvicorn running on http://0.0.0.0:3000 (Press CTRL+C to quit)
 ```
 
-### Step 3: Open in Browser
+### Step 4: Open in Browser
 Go to: `http://localhost:3000`
 
-### Step 4: Configure OpenHands
+### Step 5: Configure OpenHands
 1. Choose your AI provider (OpenAI, Anthropic, etc.)
 2. Enter your API key
 3. Start chatting!
