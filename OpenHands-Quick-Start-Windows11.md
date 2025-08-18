@@ -10,20 +10,29 @@ Starting with a clean Windows 11 Home, install these in order:
    - Open PowerShell as Administrator
    - Run: `wsl --install`
    - Restart computer when prompted
-   - **After restart**: Ubuntu should appear in Start menu
-   - **If Ubuntu is missing**: Run `wsl --install -d Ubuntu` in PowerShell
    - Verify: `wsl --version` (should show "Default Version: 2")
 
-2. **Docker Desktop** ⭐ **REQUIRED**
+2. **Ubuntu Linux Distribution** ⭐ **REQUIRED**
+   - **Usually installs automatically** with WSL, but often fails
+   - **After restart**: Check if "Ubuntu" appears in Start menu
+   - **If Ubuntu is missing** (very common!):
+     1. Open PowerShell as Administrator
+     2. Run: `wsl --install -d Ubuntu`
+     3. Wait 5-10 minutes for download/installation
+     4. Restart computer again
+     5. Search "Ubuntu" in Start menu - should appear now
+     6. Open Ubuntu to complete setup (create username/password)
+
+3. **Docker Desktop** ⭐ **REQUIRED**
    - Download: [docker.com](https://www.docker.com/products/docker-desktop/)
    - During setup: Enable "Use the WSL 2 based engine"
    - **Important**: After installation, configure WSL integration:
      - Open Docker Desktop → Settings → Resources → WSL Integration
      - Enable "Enable integration with my default WSL distro"
-     - Enable integration with "Ubuntu" (or your installed Linux distro)
+     - Enable integration with "Ubuntu"
      - Click "Apply & Restart"
 
-3. **Git for Windows** (Optional but recommended)
+4. **Git for Windows** (Optional but recommended)
    - Download: [git-scm.com](https://git-scm.com/download/win)
    - Use default installation options
 
@@ -87,7 +96,9 @@ Press `Ctrl+C` in the WSL terminal window.
 ### 🚨 **BLOCKER #1**: "I don't have Ubuntu" or "You don't have any WSL 2 distros installed"
 **This affects 80% of users!**
 
-**What happened**: `wsl --install` didn't install Ubuntu properly.
+**What happened**: `wsl --install` only installed WSL itself, but didn't install the Ubuntu Linux distribution (which is a separate dependency).
+
+**Why Ubuntu is required**: OpenHands needs a proper Linux environment to run. WSL by itself is just the framework - you need Ubuntu (or another Linux distribution) as the actual operating system.
 
 **Fix it step-by-step**:
 1. Open PowerShell **as Administrator** (right-click → "Run as administrator")
@@ -96,6 +107,7 @@ Press `Ctrl+C` in the WSL terminal window.
 4. **Restart your computer** when prompted
 5. After restart, search "Ubuntu" in Start menu - should appear now
 6. Open Ubuntu app to complete setup (create username/password)
+7. **Verify**: Type `wsl --list` in PowerShell - should show Ubuntu
 
 ### 🚨 **BLOCKER #2**: Typing `wsl` opens docker-desktop (wrong distribution)
 **This affects 90% of users!**
