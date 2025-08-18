@@ -9,9 +9,10 @@ Starting with a **clean Windows 11** system, you'll need these tools. Install th
 
 ### Required Dependencies
 
-1. **Windows Terminal** (Recommended)
+1. **Windows Terminal** (Recommended but Optional)
    - Download from Microsoft Store or [GitHub](https://github.com/microsoft/terminal)
-   - Better terminal experience than default PowerShell
+   - Modern terminal app that can run PowerShell, Command Prompt, WSL, etc.
+   - **Note**: You can use regular PowerShell instead - both work fine!
 
 2. **Docker Desktop** ⭐ **MOST IMPORTANT**
    - Download from [docker.com](https://www.docker.com/products/docker-desktop/)
@@ -85,6 +86,45 @@ docker run -it --rm --pull=always -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-
 - [ ] Start using OpenHands!
 
 **Total setup time: 15-30 minutes for a complete beginner**
+
+## Windows Terminal vs PowerShell - What's the Difference?
+
+**You're absolutely right to be confused!** Here's the clarification:
+
+### **PowerShell** = The Shell/Language
+- **PowerShell** is the **command language/shell** (like bash on Linux)
+- It's what interprets your commands like `docker run`, `git clone`, etc.
+- **This is what you're actually using** when you type commands
+
+### **Windows Terminal** = The App/Window
+- **Windows Terminal** is just a **modern terminal application**
+- It's like a fancy window that can run PowerShell, Command Prompt, WSL, etc.
+- Think of it as a "container" for different shells
+
+### **What You're Actually Using:**
+
+When you search "Terminal" and it opens:
+- **The app**: Might be Windows Terminal OR the old PowerShell app
+- **The shell**: Is PowerShell (you can see `PS C:\Users\dcrul>` in your examples)
+
+### **In VS Code:**
+- VS Code uses **PowerShell by default** on Windows
+- But it can run inside either the old PowerShell app OR Windows Terminal
+- The **commands are the same** regardless of which terminal app you use
+
+### **Why Windows Terminal is "Better":**
+- **Tabs** - multiple terminals in one window
+- **Better fonts** and colors
+- **Copy/paste** works better
+- **Customizable** themes and settings
+- **Can run multiple shells** (PowerShell, Command Prompt, WSL) in tabs
+
+### **Bottom Line:**
+- ✅ **You can keep using regular PowerShell** - it works perfectly fine!
+- ✅ **All the commands in this guide work the same** in both
+- ✅ **Windows Terminal is just a nicer experience** but not required
+
+**For OpenHands setup**: Regular PowerShell is totally fine! The Docker commands work exactly the same.
 
 ## What is OpenHands?
 
