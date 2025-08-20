@@ -19,10 +19,11 @@ Starting with a clean Windows 11 Home, install these in order:
    - **If Ubuntu is missing** (very common!):
      1. Open PowerShell as Administrator
      2. Run: `wsl --install -d Ubuntu`
-     3. Wait 5-10 minutes for download/installation
-     4. Restart computer again
-     5. Search "Ubuntu" in Start menu - should appear now
-     6. Open Ubuntu to complete setup (create username/password)
+         -  Can also download and install from the Microsoft Store
+     4. Wait 5-10 minutes for download/installation
+     5. Restart computer again
+     6. Search "Ubuntu" in Start menu - should appear now
+     7. Open Ubuntu to complete setup (create username/password)
    - **Check version**: In Ubuntu terminal: `lsb_release -a`
    - **Update**: In Ubuntu terminal: `sudo apt update && sudo apt upgrade -y`
 
@@ -31,15 +32,16 @@ Starting with a clean Windows 11 Home, install these in order:
    - **Install in Ubuntu terminal**:
      ```bash
      curl -LsSf https://astral.sh/uv/install.sh | sh
-     source $HOME/.cargo/env
+     source $HOME/.cargo/env //may not need to send this line of code
      ```
    - **Verify**: `uv --version`
+      -  You will need a new terminal tab or restart the terminal before you run this after installing.
    - **Update**: `uv self update`
 
 4. **Docker Desktop** ⭐ **REQUIRED**
    - Download: [docker.com](https://www.docker.com/products/docker-desktop/)
    - During setup: Enable "Use the WSL 2 based engine"
-   - **Important**: After installation, configure WSL integration:
+   - If you installed Docker before the above, check & configure WSL integration:
      - Open Docker Desktop → Settings → Resources → WSL Integration
      - Enable "Enable integration with my default WSL distro"
      - Enable integration with "Ubuntu"
@@ -48,27 +50,19 @@ Starting with a clean Windows 11 Home, install these in order:
 
 5. **Git for Windows** (Optional but recommended)
    - Download: [git-scm.com](https://git-scm.com/download/win)
+   - Recommended when using GitHub repos and the like
    - Use default installation options
    - **Update**: Download latest version from website
 
 ## Quick Setup Steps
 
-### Step 1: Open the Correct WSL Terminal & Set Default
-**⚠️ CRITICAL**: Never just type `wsl` - it opens the wrong distribution!
+### Step 1: Open the WSL Terminal
 
-**✅ CORRECT Methods:**
 - **Method 1 (Recommended)**: Search "Ubuntu" in Start menu and open it
-- **Method 2**: In PowerShell, type `wsl -d Ubuntu` (not just `wsl`)
-
-**❌ WRONG**: Typing just `wsl` opens docker-desktop distribution (doesn't work)
-
-**If you don't have Ubuntu yet:**
-1. Open PowerShell as Administrator
-2. Run: `wsl --install -d Ubuntu`
-3. Restart computer
-4. Then use Method 1 or 2 above
+- **Method 2**: In the Terminal, run `wsl`
 
 **Set Ubuntu as Default (Recommended):**
+If you do not, running `wsl` may open the wrong distribution.
 ```powershell
 # In PowerShell - check what distributions you have
 wsl --list
@@ -80,15 +74,23 @@ wsl --set-default Ubuntu
 wsl -d Ubuntu -- lsb_release -a
 ```
 
-### Step 2: Verify Docker is Running
+### Step 2: Verify Docker & uv
 In the Ubuntu terminal, run:
 ```bash
 docker --version
 ```
 You should see a version number.
 
-### Step 3: Run OpenHands (Official uv Method)
-In the Ubuntu terminal, run the **official recommended method**:
+Then, run:
+```bash
+uv --version
+```
+You should see a version number.
+
+### Step 3: Run OpenHands
+
+**Preferred uv Method (Recommended)**
+In the Ubuntu terminal, run:
 ```bash
 # Official OpenHands method using uv (recommended)
 uvx --python 3.12 --from openhands-ai openhands serve
@@ -107,7 +109,7 @@ docker run -it --rm --pull=always \
     docker.all-hands.dev/all-hands-ai/openhands:0.53
 ```
 
-Wait for this message:
+With either option, wait for this message:
 ```
 INFO:     Uvicorn running on http://0.0.0.0:3000 (Press CTRL+C to quit)
 ```
@@ -184,4 +186,4 @@ wsl --set-default Ubuntu
 Total time: ~15 minutes including downloads.
 
 ---
-*For detailed troubleshooting and advanced setup, see: [OpenHands-Windows11-Setup-Guide.md](OpenHands-Windows11-Setup-Guide.md)*
+*For detailed troubleshooting and advanced setup, check out the official docs: https://docs.all-hands.dev/*
